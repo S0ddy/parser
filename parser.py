@@ -14,9 +14,18 @@ V -> "arrived" | "came" | "chuckled" | "had" | "lit" | "said" | "sat"
 V -> "smiled" | "tell" | "were"
 """
 
+# We arrived the day before Thursday.
+# N V Det N P N
+
+#Holmes sat in the red armchair and he chuckled.
+# N V P Det Adj N Conj N V
+
+
 NONTERMINALS = """
-S -> N V
-S -> N V P Det Adj N Conj N V
+S -> NP VP | NP VP PP
+NP -> N | Det N
+VP -> V | V NP
+PP -> P | P N 
 """
 
 grammar = nltk.CFG.fromstring(NONTERMINALS + TERMINALS)
