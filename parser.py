@@ -1,5 +1,6 @@
 import nltk
 import sys
+import numpy 
 
 TERMINALS = """
 Adj -> "country" | "dreadful" | "enigmatical" | "little" | "moist" | "red"
@@ -14,18 +15,13 @@ V -> "arrived" | "came" | "chuckled" | "had" | "lit" | "said" | "sat"
 V -> "smiled" | "tell" | "were"
 """
 
-# We arrived the day before Thursday.
-# N V Det N P N
-
-#Holmes sat in the red armchair and he chuckled.
-# N V P Det Adj N Conj N V
-
-
 NONTERMINALS = """
-S -> NP VP | NP VP PP
-NP -> N | Det N
-VP -> V | V NP
-PP -> P | P N 
+S -> NP VP | S Conj S | VP
+NP -> N | Det N | Det AP N | NP PP
+VP -> V | V NP | V PP | AdvP VP | VP AdvP
+PP -> P NP 
+AP -> Adj| Adj AP
+AdvP -> Adv | Adv AdvP
 """
 
 grammar = nltk.CFG.fromstring(NONTERMINALS + TERMINALS)
@@ -74,7 +70,6 @@ def preprocess(sentence):
     """
     nltk.download("punkt_tab")
 
-
     words = nltk.word_tokenize(sentence)
     words = [word.lower() for word in words if word.isalpha()]
 
@@ -88,19 +83,19 @@ def np_chunk(tree):
     whose label is "NP" that does not itself contain any other
     noun phrases as subtrees.
     """
-    np_array = []
+    np_array = list()
     for subtree in tree.subtrees():
-        if(subtree.label() == "NP"):
+        if subtree.label() == "NP":
             has_inner_np = False 
             for child in subtree.subtrees():
                 if child == subtree:
                     print(child, subtree)
                 if child != subtree and child.label() == "NP":
                     has_inner_np = True
-                    break;
+                    break
             if not has_inner_np:
                 print(subtree.leaves())
-                np_array.append(subtree.leaves())
+                np_array.append(numpy.array(subtree.leaves()))
     return np_array
 
 
